@@ -5,13 +5,18 @@ import time
 from plot import Annotator
 from solve_pnp import SolvePNP
 from min_clusters import generate_minimum_clusters
-
+from centroidtracker import CentroidTracker
 model = YOLO("yolov8n-pose.onnx")
 
-cap = cv2.VideoCapture('output_video.mp4')
+# cap = cv2.VideoCapture('output_video.mp4')
+cap = cv2.VideoCapture(0)
+
 cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 annot = Annotator(cap.read())
 solver = SolvePNP(cap.read())
+person_ct = CentroidTracker()
+cluster_ct = CentroidTracker()
+
 # Initialize the slider position
 
 # Create a callback function for the trackbar
@@ -33,6 +38,7 @@ while cap.isOpened():
     for r in results:
         kpoints = r.keypoints.data
     detection_dict={}
+    person_on_image = []
     for i,keyPoints in enumerate(kpoints):
         # print(keyPoints)
         #circle the left and right wrist
@@ -46,12 +52,21 @@ while cap.isOpened():
         detection_dict[i]={'rvec':rvec,'tvec':tvec}
         #project the points into a virtual camera above the real camera to see the 3d points in a 2d image
         image_points = solver.project_on_roof_camera(tvec)
-
-        cv2.circle(blank_image, (int(image_points[0]), int(image_points[1])), annot.lw, (0, 0, 139), -1)
+        person_on_image.append(image_points)
+        # print(image_points)
+        # image_points = person_ct.update(image_points)
+        # print(image_points)
+        # cv2.circle(blank_image, (int(image_points[0]), int(image_points[1])), annot.lw, (0, 0, 139), -1)
         
-        for i in range(3):
-            cv2.putText(img_orig, str(round(tvec[i][0],2)), (10, 30+30*i), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 139), 2)
-    
+        # for i in range(3):
+        #     cv2.putText(img_orig, str(round(tvec[i][0],2)), (10, 30+30*i), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 139), 2)
+    person_points=person_ct.update(person_on_image)
+    #loop through the person points ordereddict and plot the points on the image
+    for i, (objectID, centroid) in enumerate(person_points[0].items()):
+        # print(objectID)
+        # print(centroid)
+        cv2.circle(blank_image, (int(centroid[0]), int(centroid[1])), annot.lw, (0, 0, 139), -1)
+        cv2.putText(blank_image, str(objectID), (int(centroid[0]), int(centroid[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 139), 2)
     # print(detection_dict)
     tvec_list = [detection_dict[i]['tvec'] for i in range(len(detection_dict))]
 
@@ -88,3 +103,4 @@ while cap.isOpened():
         break
 cap.release()
 cv2.destroyAllWindows()
+
