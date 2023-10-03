@@ -32,34 +32,24 @@ class SolvePNP:
         self.roof_camera_rotation = np.array([np.pi/2,0,0],dtype='float32') #create the rotation vector to a projection image above the camera (xz opencv camera plane)
 
     def solve(self,keyPoints):
-        # print(keyPoints[6][:2])
         image_points = np.array([keyPoints[6][:2], keyPoints[5][:2], keyPoints[11][:2],keyPoints[12][:2]], dtype="float32")
-        # print(image_points.shape)
-        # print(self.body_pointes.shape)
+
         (success, rotation_vector, translation_vector) = cv2.solvePnP(self.body_pointes, image_points, self.camera_matrix, self.dist_coeffs, flags=cv2.SOLVEPNP_ITERATIVE)
-        # print("rotation_vector", rotation_vector)
-        # print("translation_vector", translation_vector)
+
         return rotation_vector, translation_vector
     
     def pose_matrix(self,translation, rotation_matrix):
         if rotation_matrix.shape != (3, 3):
             rotation_matrix = cv2.Rodrigues(rotation_matrix)[0]
-
     # Create a 4x4 identity matrix
         pose = np.eye(4)
-
         # Fill in the translation part (top 3x1 corner)
         pose[:3, 3] = translation
-
         # Fill in the rotation part (top-left 3x3 corner)
-        pose[:3, :3] = rotation_matrix
-
+        pose[:3, :3] = rotation_matrix 
         return pose
     
     def project_on_roof_camera(self,point_tvec):
-        # print(rotation_matrix)
-        # print(pose)
 
         image_points = cv2.projectPoints(point_tvec, self.roof_camera_rotation, self.roof_camera_translation, self.camera_matrix, self.dist_coeffs)[0].reshape(-1, 2)
-        # print('image_points',image_points)
         return image_points[0]

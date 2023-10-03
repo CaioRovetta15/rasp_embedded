@@ -72,8 +72,6 @@ class CentroidTracker():
 
             D = dist.cdist(np.array(objectCentroids), inputCentroids)
 
-            print(D)
-
             rows = D.min(axis=1).argsort()
             cols = D.argmin(axis=1)[rows]
 
