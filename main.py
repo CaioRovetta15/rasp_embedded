@@ -8,14 +8,15 @@ from min_clusters import generate_minimum_clusters
 
 model = YOLO("yolov8n-pose.onnx")
 
-cap = cv2.VideoCapture('output_video.mp4')
+# cap = cv2.VideoCapture('output_video.mp4')
+cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 annot = Annotator(cap.read())
 solver = SolvePNP(cap.read())
 # Initialize the slider position
 
 # Create a callback function for the trackbar
-slider_position = 80
+talk_radius = 200 #cm
 # Create a window to display the video feed
 cv2.namedWindow('output')
 
@@ -59,13 +60,13 @@ while cap.isOpened():
     tvec_array = np.array(tvec_list).reshape(-1, 3)
 
     # Generate clusters
-    clusters = generate_minimum_clusters(tvec_array, max_radius=200, min_points_per_cluster=1,plot_2d=False) #max_radius=50 (cm), min_points_per_cluster=1
+    clusters = generate_minimum_clusters(tvec_array, max_radius=talk_radius, min_points_per_cluster=1,plot_2d=False) #max_radius=50 (cm), min_points_per_cluster=1
     
     for i, cluster in enumerate(clusters):
         cluster_points = np.array([tvec_list[idx] for idx in cluster])
         cluster_center = np.mean(cluster_points, axis=0)
 
-        radius_distance = np.array([0,0,200],dtype='float32').reshape(3, 1)
+        radius_distance = np.array([0,0,talk_radius],dtype='float32').reshape(3, 1)
         cluster_radius = cluster_center + radius_distance
         cluster_radius_on_image = solver.project_on_roof_camera(cluster_radius)
 
