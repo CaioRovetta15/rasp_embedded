@@ -50,6 +50,9 @@ class SolvePNP:
         return pose
     
     def project_on_roof_camera(self,point_tvec):
-
         image_points = cv2.projectPoints(point_tvec, self.roof_camera_rotation, self.roof_camera_translation, self.camera_matrix, self.dist_coeffs)[0].reshape(-1, 2)
-        return image_points[0]
+        return image_points
+    
+    def project_on_camera(self,point_tvec):                                 #camera angle is 30 degrees (0.523599 radians)
+        image_points = cv2.projectPoints(point_tvec, np.eye(3), np.array([0,-0.523599,0],dtype='float32'), self.camera_matrix, self.dist_coeffs)[0].reshape(-1, 2)
+        return image_points
