@@ -18,7 +18,7 @@ class SolvePNP:
         self.body_pointes = np.array([  (0.0, 0.0, 0.0),  #left shoulder
                                         (60.0,0.0,0.0),  #right shoulder
                                         (55,102,0.0),
-                                        (5,102,0.0)],dtype='float32')  #right wip
+                                        (5,102,0.0)],dtype='float32')  #right side of waist 
         size = img_orig[1].shape
         focal_length = size[1]
         center = (size[1]/2, size[0]/2)
