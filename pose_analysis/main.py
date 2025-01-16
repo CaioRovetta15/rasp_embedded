@@ -14,7 +14,7 @@ from centroidtracker import CentroidTracker
 model = YOLO("yolov8n-pose.onnx")
 
 # Open a video capture device (0 for default camera, or specify a video file)
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('5.mp4')
 cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
 # Initialize instances of custom classes
@@ -116,11 +116,13 @@ while cap.isOpened():
 
     cv2.polylines(img_orig, np.int32([interest_zone_on_image]), True, (0, 0, 0), 2)
     # Display the annotated images
+    #resize images to HD
+    img_orig = cv2.resize(img_orig, (1280, 720))
+    blank_image = cv2.resize(blank_image, (1280, 720))
     cv2.imshow('output', img_orig)
     cv2.imshow('blank_image', blank_image)
-
     # Exit the loop if 'q' is pressed
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(200) & 0xFF == ord('q'):
         break
 
 # Release the video capture and close windows

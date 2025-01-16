@@ -26,7 +26,7 @@ class SolvePNP:
                                         [0, focal_length, center[1]],
                                         [0, 0, 1]], dtype = "float32")
         self.dist_coeffs = np.zeros((4,1), dtype="float32")
-        self.projection_camera_height = 2000 #height of the camera from the ground (cm)
+        self.projection_camera_height = 10000 #height of the camera from the ground (cm)
         self.projection_camera_distance = 100  #forward distance of the projection from the camera (cm) 
         self.roof_camera_translation = np.array([0,self.projection_camera_distance,self.projection_camera_height],dtype='float32') #create the translation vector to a projection image above the camera (xz opencv camera plane)
         self.roof_camera_rotation = np.array([np.pi/2,0,0],dtype='float32') #create the rotation vector to a projection image above the camera (xz opencv camera plane)
