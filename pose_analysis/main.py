@@ -29,8 +29,8 @@ talk_radius = 200  # in centimeters
 # Create a window to display the video feed
 cv2.namedWindow('output')
 
-interest_zone = np.array([[200, 0,0], [200,0,200], [0, 0,200], [0, 0,0]], dtype='float32')
-zone_translation = np.array([-100,120,400],dtype='float32')
+interest_zone = np.array([[200, 0, 0], [200, 0, 200], [0, 0, 200], [0, 0, 0]], dtype='float32')
+zone_translation = np.array([-100, 120, 400], dtype='float32')
 interest_zone = interest_zone + zone_translation
 
 # Main loop for processing video frames
@@ -45,7 +45,7 @@ while cap.isOpened():
     start_time = time.time()
 
     # Perform object detection using YOLO model
-    results = model(img_orig, save_txt=False, stream=True, verbose=False, imgsz=(224, 224))
+    results = model(img_orig, save_txt=False, stream=True, verbose=False, imgsz=(224, 224), device='cpu')
 
     # Process keypoints detected by the YOLO model
     for r in results:
@@ -111,7 +111,7 @@ while cap.isOpened():
 
     # interest_zone_on_image = interest_zone_on_image.reshape(-1, 2)
     cv2.polylines(blank_image, np.int32([interest_zone_on_image]), True, (0, 0, 0), 2)
-    #project on original camera
+    # project on original camera
     interest_zone_on_image = solver.project_on_camera(interest_zone)
 
     cv2.polylines(img_orig, np.int32([interest_zone_on_image]), True, (0, 0, 0), 2)
